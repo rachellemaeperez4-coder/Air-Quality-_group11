@@ -48,6 +48,28 @@ router.get("/overview", async (req, res) => {
   } catch (error) { fail(res, error); }
 });
 
+router.get("/latest-readings", async (req, res) => {
+  try {
+    const afterId = Number.parseInt(req.query.after_id, 10);
+    let query = req.supabase
+      .from("air_quality_readings")
+      .select("reading_id,mq135_value,air_quality_status,recorded_at")
+      .order("reading_id", { ascending: Number.isInteger(afterId) && afterId > 0 })
+      .limit(100);
+
+    if (Number.isInteger(afterId) && afterId > 0) {
+      query = query.gt("reading_id", afterId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    res.set("Cache-Control", "no-store").json({ rows: data || [] });
+  } catch (error) {
+    fail(res, error);
+  }
+});
+
 router.get("/:module", async (req, res) => {
   const module = req.params.module;
   const supabase = req.supabase;

@@ -85,3 +85,16 @@
 :root[data-theme="light"] .staff-app .management-form select option{background:#fff;color:var(--ink)}
 :root[data-theme="light"] .staff-app button.button.secondary{border-color:#c9d6df;background:#edf3f6;color:#304a5b}
 :root[data-theme="light"] .staff-app button.button.secondary:hover:not(:disabled){background:#dfeaf0}
+
+.staff-reading-alert-overlay{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgb(2 12 17 / .76);backdrop-filter:blur(5px)}
+.staff-reading-alert{width:min(460px,100%);padding:30px;border:1px solid #365365;border-radius:18px;background:#102435;color:#e8f1f6;box-shadow:0 24px 80px rgb(0 0 0 / .45);animation:staff-alert-enter .2s ease-out}
+.staff-reading-alert-icon{display:grid;width:48px;height:48px;place-items:center;margin-bottom:18px;border-radius:50%;background:#735313;color:#ffe08a;font-size:27px;font-weight:800}
+.staff-reading-alert-hazardous .staff-reading-alert-icon,.staff-reading-alert-very-hazardous .staff-reading-alert-icon{background:#713338;color:#ffd4d6}
+.staff-reading-alert-eyebrow{color:#a9bfce;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.staff-reading-alert h2{margin:8px 0 10px;font-size:25px}
+.staff-reading-alert p{margin:0;line-height:1.55}
+.staff-reading-alert-time{margin-top:13px!important;color:#9fb4c2;font-size:12px}
+.staff-reading-alert button{width:100%;margin-top:22px;padding:11px}
+@keyframes staff-alert-enter{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+:root[data-theme="light"] .staff-reading-alert{background:#fff;color:#152d3d;border-color:#dce5eb}
+:root[data-theme="light"] .staff-reading-alert-eyebrow,:root[data-theme="light"] .staff-reading-alert-time{color:#738493}
