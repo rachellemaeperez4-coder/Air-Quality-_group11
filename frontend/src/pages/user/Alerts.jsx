@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../lib/api";
+import { formatReadingTime } from "../../lib/time";
 import UserLayout from "../../components/UserLayout";
 
-const time = (value) => value ? new Date(value).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "—";
+const time = formatReadingTime;
 
 function UserAlerts() {
   const [data, setData] = useState(null);

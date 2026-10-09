@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import StaffLayout from "../../components/StaffLayout";
 import { apiRequest } from "../../lib/api";
+import { formatReadingTime } from "../../lib/time";
 
-const showTime = (value) => value
-  ? new Date(value).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
-  : "—";
+const showTime = formatReadingTime;
 
 function StaffAlerts() {
   const [data, setData] = useState(null);

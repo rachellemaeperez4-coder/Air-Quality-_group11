@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../../lib/api";
+import { formatReadingTime, startOfPhilippineDay } from "../../lib/time";
 import UserLayout from "../../components/UserLayout";
 
-const formatTime = (value) => value ? new Date(value).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "—";
+const formatTime = (value) => value ? formatReadingTime(value) : "—";
 const formatValue = (value) => value === null || value === undefined ? "—" : String(value);
 
 function ReadingAlert({ reading }) {
@@ -72,7 +73,7 @@ function UserDashboard() {
     const now = data.trend?.[0]?.recorded_at
       ? new Date(data.trend[0].recorded_at).getTime()
       : data.latest?.recorded_at ? new Date(data.latest.recorded_at).getTime() : 0;
-    const cutoff = range === "today" ? new Date().setHours(0, 0, 0, 0) : now - (range === "7days" ? 7 : 30) * 86400000;
+    const cutoff = range === "today" ? startOfPhilippineDay() : now - (range === "7days" ? 7 : 30) * 86400000;
     return (data.trend || []).filter((row) => row.sensor_value !== null && new Date(row.recorded_at).getTime() >= cutoff).slice().reverse();
   }, [data, range]);
 

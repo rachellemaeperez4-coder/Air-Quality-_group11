@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import StaffLayout from "../../components/StaffLayout";
 import { apiRequest } from "../../lib/api";
+import { formatReadingTime } from "../../lib/time";
 
-const showTime = (value) => value
-  ? new Date(value).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
-  : "—";
+const showTime = formatReadingTime;
 
 const modules = [
   ["alerts", "Alerts", "Review and update alert states."],

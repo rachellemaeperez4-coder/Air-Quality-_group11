@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getSupabaseClient } from "../lib/supabase";
 import { clearRoleVerification } from "../lib/role-verification";
 import { apiRequest } from "../lib/api";
+import { formatReadingTime } from "../lib/time";
 import "../../../style.css";
 import "../css/Staff.css";
 
@@ -82,7 +83,7 @@ function StaffReadingAlert() {
         <span className="staff-reading-alert-eyebrow">New sensor reading</span>
         <h2 id="staff-reading-alert-title">{status} air quality</h2>
         <p id="staff-reading-alert-description">The latest sensor reading is <strong>{reading.mq135_value ?? "—"}</strong>. Please check the monitoring zone.</p>
-        <p className="staff-reading-alert-time">Reading #{reading.reading_id}{reading.recorded_at ? ` · ${new Date(reading.recorded_at).toLocaleString()}` : ""}</p>
+        <p className="staff-reading-alert-time">Reading #{reading.reading_id}{reading.recorded_at ? ` · ${formatReadingTime(reading.recorded_at)}` : ""}</p>
         <button className="button" type="button" onClick={() => setQueue((current) => current.slice(1))}>Acknowledge</button>
       </section>
     </div>

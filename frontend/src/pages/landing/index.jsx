@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { apiRequest } from "../../lib/api";
+import { formatReadingTime } from "../../lib/time";
 import "../../css/Home.css";
 
 const Login = lazy(() => import("../Login"));
@@ -69,7 +70,7 @@ function Home() {
               {zones.map((zone) => (
                 <article className={`live-zone ${zone.class}`} key={zone.name}>
                   <div className="live-zone-row">
-                    <h3>{zone.name}<small>{[zone.location, zone.recorded_at && new Date(zone.recorded_at).toLocaleString()].filter(Boolean).join(" · ")}</small></h3>
+                    <h3>{zone.name}<small>{[zone.location, zone.recorded_at && formatReadingTime(zone.recorded_at)].filter(Boolean).join(" · ")}</small></h3>
                     <div className="live-reading">{zone.aqi}<span>{zone.status}</span></div>
                   </div>
                   <div className="live-track"><span style={{ width: `${zone.width}%` }} /></div>

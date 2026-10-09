@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import StaffLayout from "../../components/StaffLayout";
 import { apiRequest } from "../../lib/api";
+import { formatReadingTime } from "../../lib/time";
 import { getSupabaseClient } from "../../lib/supabase";
 
 const titles = {
@@ -17,7 +18,7 @@ const specs = {
   devices: { id: "device_id", fields: [{ key: "device_name", label: "Device name", required: true }, { key: "device_code", label: "Device code", required: true }, { key: "status", label: "Status" }] },
   sensors: { id: "sensor_id", fields: [{ key: "sensor_name", label: "Sensor name", required: true }, { key: "sensor_type", label: "Sensor type", required: true }, { key: "unit", label: "Unit" }, { key: "status", label: "Status" }] },
 };
-const showTime = (value) => value ? new Date(value).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "—";
+const showTime = formatReadingTime;
 
 function StaffConsole({ section: requestedSection }) {
   const { module: routeModule = "dashboard" } = useParams();
