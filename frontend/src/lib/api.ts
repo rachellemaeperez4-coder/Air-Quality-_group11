@@ -1,4 +1,6 @@
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/$/, "");
+// Use same-origin /api in production; the Vercel Services rewrites route it
+// to the Node service. Vite proxies the same path to localhost during dev.
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
 export async function apiRequest<T>(path: string, body?: unknown, method: "GET" | "POST" | "PATCH" | "DELETE" = "POST"): Promise<T> {
   let response: Response;
