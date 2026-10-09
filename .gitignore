@@ -1,0 +1,10 @@
+﻿# Local credentials and configuration
+/config.local.php
+/esp32/secrets.h
+/esp32/esp32_air_quality/secrets.h
+
+# Local editor and build output
+/.vscode/
+/vendor/
+*.zip
+.DS_Store
