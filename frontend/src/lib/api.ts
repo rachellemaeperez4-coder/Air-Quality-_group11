@@ -22,9 +22,27 @@ export async function apiRequest<T>(path: string, body?: unknown, method: "GET" 
     throw new Error("Unable to reach the Node backend. Check that it is running and configured.");
   }
 
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(typeof result.error === "string" ? result.error : "The request failed. Please try again.");
+  const responseText = await response.text();
+  let result: { error?: unknown } = {};
+  try {
+    result = responseText ? JSON.parse(responseText) : {};
+  } catch {
+    // Vercel and proxy errors can be HTML or plain text instead of API JSON.
   }
-  return result as T;
+
+  if (!response.ok) {
+    const apiError = typeof result.error === "string"
+      ? result.error
+      : responseText && !responseText.trimStart().startsWith("<")
+        ? responseText.slice(0, 200)
+        : `The API returned HTTP ${response.status}. Check the deployment logs.`;
+    throw new Error(apiError);
+  }
+
+  if (!responseText) return {} as T;
+  try {
+    return JSON.parse(responseText) as T;
+  } catch {
+    throw new Error(`The API returned an unreadable response (HTTP ${response.status}). Check the deployment logs.`);
+  }
 }
