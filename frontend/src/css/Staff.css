@@ -1,0 +1,87 @@
+.staff-app .content{width:min(1440px,100%);margin:0 auto;padding:34px clamp(22px,4vw,54px) 46px}.staff-app .page-heading{margin-bottom:23px}.staff-app .overview-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.staff-app .overview-stat{padding:17px;border:1px solid var(--line);border-radius:11px;background:#fff;box-shadow:var(--shadow)}.staff-app .overview-stat span,.staff-app .overview-stat small{display:block;color:var(--muted);font-size:11px}.staff-app .overview-stat strong{display:block;margin:10px 0;font-size:26px}.staff-app .section{margin-top:19px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow)}.staff-app .section-head{padding:16px 19px;border-bottom:1px solid var(--line)}.staff-app .section-head h2{margin:0;font-size:15px}.staff-app .section-head p{color:var(--muted);font-size:11px}.staff-app .section-body{padding:17px 19px}.staff-app .module-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.staff-app .module-card{padding:18px;border:1px solid var(--line);border-radius:11px;background:var(--card);text-decoration:none;color:var(--ink)}.staff-app .module-card span,.staff-app .module-card small{display:block}.staff-app .module-card small{margin-top:7px;color:var(--muted)}.staff-app .management-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end}.staff-app .management-form label{display:grid;gap:5px;color:var(--muted);font-size:11px}.staff-app .management-form input,.staff-app .management-form select{min-width:0;height:37px;padding:0 9px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink)}.staff-app .section input,.staff-app .section select{color:var(--ink)}.staff-app .section td input,.staff-app .section td select{max-width:190px;padding:7px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}.staff-app .row-actions{display:flex;gap:6px;flex-wrap:wrap}.staff-app .pagination{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:15px}.staff-app .module-grid a:hover{border-color:var(--green)}.staff-app .status-pill{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eaf5ef;color:#27664b;font-size:10px}.staff-app .notice{margin:16px 0}.staff-app .staff-toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:15px 0}.staff-app .staff-toolbar label{display:grid;gap:5px;font-size:11px;color:var(--muted)}.staff-app .staff-toolbar input{height:36px;padding:0 9px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink)}.staff-app .empty-cell{text-align:center;padding:28px;color:var(--muted)}@media(max-width:850px){.staff-app .module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.staff-app .overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.staff-app .module-grid,.staff-app .overview-stats{grid-template-columns:1fr}}
+
+/* Keep staff management panels readable over the dark console background. */
+.staff-app .overview-stat,
+.staff-app .section,
+.staff-app .module-card{background:#102435;color:#e4eef5}
+.staff-app .overview-stat span,
+.staff-app .overview-stat small,
+.staff-app .section-head p,
+.staff-app .module-card small,
+.staff-app .management-form label,
+.staff-app .staff-toolbar label{color:#a9bfce}
+.staff-app .section-head h2,
+.staff-app .overview-stat strong,
+.staff-app .section-body,
+.staff-app .pagination,
+.staff-app .module-card{color:#e4eef5}
+.staff-app .section-head{border-color:#294354}
+.staff-app .section-head h2{color:#e4eef5}
+.staff-app th{background:#183246;color:#a9bfce}
+.staff-app td{background:#102435;color:#d6e3eb;border-color:#294354}
+.staff-app td small{color:#9fb4c2}
+.staff-app tbody tr:hover td{background:#163044}
+.staff-app .management-form input,
+.staff-app .management-form select,
+.staff-app .section input,
+.staff-app .section select,
+.staff-app .staff-toolbar input{background:#0b1c29;color:#e4eef5;border-color:#365365}
+.staff-app .section input::placeholder{color:#9fb4c2}
+.staff-app .section select,
+.staff-app .management-form select{appearance:auto!important;color-scheme:dark;background-color:#0b1c29!important;color:#e4eef5!important;border:1px solid #365365!important}
+.staff-app .section select option,
+.staff-app .management-form select option{background:#102435;color:#e4eef5}
+.staff-app button.button{min-height:30px;padding:7px 11px;border:1px solid #218f73;border-radius:6px;background:#167b67;color:#fff;font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;cursor:pointer}
+.staff-app button.button:hover:not(:disabled){background:#1b9277;border-color:#36a98a}
+.staff-app button.button.secondary{border-color:#365365;background:#183246;color:#dce8ef}
+.staff-app button.button.secondary:hover:not(:disabled){background:#23465b}
+.staff-app button.button.danger{border-color:#a34b50;background:#84343a;color:#fff}
+.staff-app button.button.danger:hover:not(:disabled){background:#a63f45}
+.staff-app button.button:disabled{opacity:.55;cursor:not-allowed}
+.staff-app button.button:focus-visible,
+.staff-app select:focus-visible{outline:3px solid #53c9a5;outline-offset:2px}
+
+.staff-app .accounts-toolbar{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.staff-app .accounts-toolbar label{display:grid;gap:6px;min-width:min(320px,100%);color:var(--muted);font-size:12px}
+.staff-app .accounts-toolbar input{height:38px;padding:0 11px;border:1px solid #365365;border-radius:7px;background:#0b1c29;color:#e4eef5}
+.staff-app .accounts-toolbar input::placeholder{color:#8da3b2}
+.staff-app .accounts-toolbar>span{padding-bottom:10px;color:var(--muted);font-size:12px}
+
+.theme-toggle{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer}
+.theme-toggle:hover{border-color:var(--green);color:var(--green)}
+.theme-toggle:focus-visible{outline:3px solid #53c9a5;outline-offset:2px}
+
+:root[data-theme="light"]{color-scheme:light;--bg:#f3f6f9;--bg-grad-a:#edf4f7;--bg-grad-b:#f6f8fb;--surface:#fff;--surface-2:#f5f8fa;--card:#fff;--glass:rgb(255 255 255 / .92);--line:#dce5eb;--line-strong:#c7d4dd;--ink:#152d3d;--ink-2:#3b5463;--muted:#738493;--nav-a:#102a43;--nav-b:#0b1b2a;--nav-ink:#c9d8e2;--nav-muted:#9bb0c1;--good:#187c50;--good-bg:#e6f6ec;--shadow-sm:0 1px 2px rgb(15 42 55 / .05),0 2px 8px rgb(15 42 55 / .04);--shadow-md:0 1px 2px rgb(15 42 55 / .04),0 12px 32px rgb(15 42 55 / .07);--shadow-lg:0 2px 4px rgb(15 42 55 / .05),0 22px 48px rgb(15 42 55 / .12)}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#07131d;--bg-grad-a:#0a1b28;--bg-grad-b:#07131d;--surface:#0e2130;--surface-2:#112739;--card:#102435;--glass:rgb(10 28 42 / .92);--line:#1c3547;--line-strong:#27475c;--ink:#e8f1f6;--ink-2:#b4c7d3;--muted:#7f98a8;--nav-a:#06121c;--nav-b:#0a1f30;--nav-ink:#c9d8e2;--nav-muted:#8aa4b6;--good:#4fd08a;--good-bg:rgb(79 208 138 / .12);--shadow-sm:0 1px 2px rgb(0 0 0 / .3);--shadow-md:0 12px 32px rgb(0 0 0 / .35);--shadow-lg:0 22px 48px rgb(0 0 0 / .5)}
+
+:root[data-theme="light"] .staff-app .overview-stat,
+:root[data-theme="light"] .staff-app .section,
+:root[data-theme="light"] .staff-app .module-card{background:var(--surface);color:var(--ink)}
+:root[data-theme="light"] .staff-app .overview-stat span,
+:root[data-theme="light"] .staff-app .overview-stat small,
+:root[data-theme="light"] .staff-app .section-head p,
+:root[data-theme="light"] .staff-app .module-card small,
+:root[data-theme="light"] .staff-app .management-form label,
+:root[data-theme="light"] .staff-app .staff-toolbar label{color:var(--muted)}
+:root[data-theme="light"] .staff-app .section-head h2,
+:root[data-theme="light"] .staff-app .overview-stat strong,
+:root[data-theme="light"] .staff-app .section-body,
+:root[data-theme="light"] .staff-app .pagination{color:var(--ink)}
+:root[data-theme="light"] .staff-app .section-head{border-color:var(--line)}
+:root[data-theme="light"] .staff-app th{background:#eaf1f5;color:#526a79}
+:root[data-theme="light"] .staff-app td{background:#fff;color:#344c5c;border-color:var(--line)}
+:root[data-theme="light"] .staff-app td small{color:var(--muted)}
+:root[data-theme="light"] .staff-app tbody tr:hover td{background:#f3f7fa}
+:root[data-theme="light"] .staff-app .management-form input,
+:root[data-theme="light"] .staff-app .management-form select,
+:root[data-theme="light"] .staff-app .section input,
+:root[data-theme="light"] .staff-app .section select,
+:root[data-theme="light"] .staff-app .staff-toolbar input,
+:root[data-theme="light"] .staff-app .accounts-toolbar input{background:#fff;color:var(--ink);border-color:var(--line-strong)}
+:root[data-theme="light"] .staff-app .section input::placeholder{color:#8293a0}
+:root[data-theme="light"] .staff-app .section select,
+:root[data-theme="light"] .staff-app .management-form select{color-scheme:light;background-color:#fff!important;color:var(--ink)!important;border-color:var(--line-strong)!important}
+:root[data-theme="light"] .staff-app .section select option,
+:root[data-theme="light"] .staff-app .management-form select option{background:#fff;color:var(--ink)}
+:root[data-theme="light"] .staff-app button.button.secondary{border-color:#c9d6df;background:#edf3f6;color:#304a5b}
+:root[data-theme="light"] .staff-app button.button.secondary:hover:not(:disabled){background:#dfeaf0}

@@ -1,0 +1,136 @@
+.app-shell:not(.staff-app) .dashboard-content {
+  width: min(1440px, 100%);
+  min-width: 0;
+  margin: 0 auto;
+  padding: 34px clamp(22px, 4vw, 54px) 46px;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .page-heading {
+  margin-bottom: 22px;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .reading-status-value {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .reading-status-value strong {
+  color: #e4eef5;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .filters {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.5fr) repeat(3, minmax(125px, 1fr));
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 20px;
+  overflow: visible;
+  border: 1px solid #294354;
+  border-radius: 12px;
+  background: #102435;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .filters label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  color: #b5c8d4;
+  font-size: 12px;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .filters input,
+.app-shell:not(.staff-app) .dashboard-content .filters select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #365365;
+  border-radius: 7px;
+  background: #0b1c29;
+  color: #e4eef5;
+  color-scheme: dark;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .filters input::placeholder {
+  color: #9fb4c2;
+}
+
+.app-shell:not(.staff-app) .dashboard-content .filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.app-shell:not(.staff-app) button.button {
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid #218f73;
+  border-radius: 7px;
+  background: #167b67;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.app-shell:not(.staff-app) button.button:hover:not(:disabled) {
+  background: #1b9277;
+}
+
+.app-shell:not(.staff-app) button.button.secondary {
+  border-color: #365365;
+  background: #183246;
+  color: #dce8ef;
+}
+
+.app-shell:not(.staff-app) button.button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.app-shell:not(.staff-app) .trend-chart line {
+  stroke: #355064;
+  stroke-width: .45;
+  vector-effect: non-scaling-stroke;
+}
+
+.app-shell:not(.staff-app) .trend-chart polyline {
+  fill: none;
+  stroke: #46d3a3;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+@media (max-width: 1000px) {
+  .app-shell:not(.staff-app) .dashboard-content .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell:not(.staff-app) .dashboard-content {
+    padding: 26px 18px 35px;
+  }
+}
+
+@media (max-width: 500px) {
+  .app-shell:not(.staff-app) .dashboard-content {
+    padding: 22px 14px 30px;
+  }
+
+  .app-shell:not(.staff-app) .dashboard-content .filters {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+}

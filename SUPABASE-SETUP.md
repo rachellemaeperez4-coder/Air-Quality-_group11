@@ -15,14 +15,9 @@ rows have matching emails but no Auth link, the migration stops and rolls back
 instead of linking potentially privileged accounts by email. Verify ownership
 before linking those rows. Share the SQL error if this happens.
 
-The PHP login now reads public.users. Run the migration before testing login.
-Refresh http://localhost:8000 and use Sign in > Create User account.
-For email confirmation, configure the Supabase Site URL as http://localhost:8000
-and configure email delivery. Confirm your email, then sign in.
+The React login and Node API use public.users. Run this migration before testing the deployed application. For local development, use the Vite frontend URL (http://localhost:5173) as the Supabase Auth Site URL and configure email delivery before testing email confirmation.
 
-The publishable key cannot run SQL migrations. Run this in the project dashboard.
-PHP sessions store the Auth access token server-side and expire with that token.
-Dashboard requests verify Auth identity and the current role.
+The React frontend stores the Supabase Auth session in the browser. Protected Node API routes verify the Auth user, current role, and account status on each request.
 
 For the staff console, run supabase-readings-access.sql in the Supabase SQL
 Editor after the users migration. It preserves read-only access for User
@@ -104,23 +99,11 @@ zone_id/device_id/sensor_id values. Repeated readings at or below the previous
 alert peak do not create duplicates; readings above that peak create a new alert.
 GOOD readings resolve active alerts for that sensor and begin a fresh episode.
 The trigger never inserts synthetic readings. Keep SQL in the Supabase SQL
-Editor; never put a service-role key in PHP.
+Editor; never expose a service-role key. The Node API uses the publishable key together with the signed-in user access token and relies on row-level security.
 
-The Staff console is divided into separate pages: staff/dashboard.php is the
-module overview, with dedicated alerts.php, zones.php, devices.php, sensors.php,
-accounts.php, thresholds.php, readings.php, and audit.php pages. Each page uses
-the signed-in Staff access token for its own database operations. Staff can edit
-zones, devices, and sensors; change alert status; manage readings; promote or
-disable linked accounts; send password-reset emails through Supabase Auth; and
-export readings to CSV. Device tokens remain in Supabase for ESP32 upload
-authentication and are no longer managed through a Staff Console page.
-Existing Auth account creation remains in Supabase Auth / the existing
-user-registration flow; the management page does not create passwords or
-require a service-role credential.
+The React Staff console has routes for overview, alerts, devices, sensors, accounts, thresholds, readings, and alert history. The Node API uses the signed-in Staff access token for database operations. Staff can edit zones, devices, and sensors; change alert status; manage readings; promote or disable linked accounts; send password-reset emails through Supabase Auth; and export readings to CSV. Device tokens remain in Supabase for ESP32 upload authentication and are not managed through the Staff Console. Auth account creation remains in Supabase Auth; the management page does not create passwords and the app does not require a service-role credential.
 
-Account disablement is checked on PHP requests and by the shared database read
-policies, so run supabase-admin-core.sql before deploying the updated login
-and dashboard code.
+Account disablement is checked by the Node API and shared database read policies. Run supabase-admin-core.sql before deploying the React app and API.
 
 For ESP32 readings to reach Supabase, use a real Wi-Fi-connected ESP32 (the
 simulator mode cannot upload), set ENABLE_WIFI to true, and configure the Wi-Fi
