@@ -159,6 +159,22 @@ function staff_sensor_status($value, array $thresholds): string {
     return aqm_quality_status($value, $thresholds);
 }
 
+if ($staffModule === 'overview' && ($_GET['overview_data'] ?? '') === '1') {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    try {
+        $latestRows = staff_read(
+            'air_quality_readings?select=reading_id,mq135_value,air_quality_status,recorded_at&order=recorded_at.desc.nullslast,reading_id.desc&limit=10',
+            $account['token']
+        );
+        echo json_encode(['readings' => $latestRows], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
+    } catch (RuntimeException $error) {
+        http_response_code(502);
+        echo json_encode(['error' => $error->getMessage()], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
+    }
+    exit;
+}
+
 function staff_sensor_field_type(array $definition): string {
     $type = $definition['type'] ?? 'string';
     if (isset($definition['enum']) && is_array($definition['enum'])) return 'select';
@@ -855,7 +871,7 @@ html[data-theme="dark"] .theme-toggle-track:after{transform:translateX(10px)}
                     <td><?= staff_time($reading['recorded_at'] ?? null) ?></td>
                 </tr>
                 <?php endforeach; ?>
-                <?php if (!$overviewReadings): ?><tr><td colspan="6" class="empty-cell"><?= $overviewErrors ? 'Latest readings could not be loaded. See the error above.' : 'No sensor readings are available yet.' ?></td></tr><?php endif; ?>
+                <?php if (!$overviewReadings): ?><tr><td colspan="4" class="empty-cell"><?= $overviewErrors ? 'Latest readings could not be loaded. See the error above.' : 'No sensor readings are available yet.' ?></td></tr><?php endif; ?>
                 </tbody>
             </table></div>
         </section>
@@ -1038,20 +1054,63 @@ html[data-theme="dark"] .theme-toggle-track:after{transform:translateX(10px)}
         refreshing = true;
         const status = document.getElementById('overview-refresh-status');
         try {
-            const response = await fetch(window.location.href, {
+            const endpoint = new URL(window.location.href);
+            endpoint.searchParams.set('overview_data', '1');
+            const response = await fetch(endpoint, {
                 cache: 'no-store',
                 credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            const html = await response.text();
-            const updatedDocument = new DOMParser().parseFromString(html, 'text/html');
-            for (const sectionId of ['overview-stats', 'latest-readings']) {
-                const updatedSection = updatedDocument.getElementById(sectionId);
-                const currentSection = document.getElementById(sectionId);
-                if (!updatedSection || !currentSection) throw new Error(`Missing ${sectionId} section.`);
-                currentSection.replaceWith(updatedSection);
+            const data = await response.json();
+            if (!Array.isArray(data.readings)) throw new Error(data.error || 'Invalid readings response.');
+            const tbody = document.querySelector('#latest-readings tbody');
+            if (!tbody) throw new Error('Latest readings table is unavailable.');
+            const readings = data.readings;
+            const formatTime = value => {
+                const date = value ? new Date(value) : null;
+                return date && Number.isFinite(date.getTime())
+                    ? date.toLocaleString(undefined, {timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'})
+                    : '—';
+            };
+            tbody.replaceChildren();
+            if (readings.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 4;
+                cell.className = 'empty-cell';
+                cell.textContent = 'No sensor readings are available yet.';
+                row.append(cell);
+                tbody.append(row);
+            } else {
+                for (const reading of readings) {
+                    const row = document.createElement('tr');
+                    for (const value of [
+                        `#${reading.reading_id ?? ''}`,
+                        reading.mq135_value ?? '—',
+                        reading.air_quality_status || 'Unknown',
+                        formatTime(reading.recorded_at),
+                    ]) {
+                        const cell = document.createElement('td');
+                        cell.textContent = String(value);
+                        row.append(cell);
+                    }
+                    tbody.append(row);
+                }
+            }
+
+            const currentCard = document.querySelectorAll('#overview-stats .overview-stat')[1];
+            const latest = readings[0] || null;
+            const currentValue = currentCard?.querySelector('strong');
+            const currentSmall = currentCard?.querySelector('small');
+            if (currentValue) currentValue.textContent = latest?.mq135_value ?? '—';
+            if (currentSmall) {
+                const level = currentSmall.querySelector('.status-pill') || document.createElement('span');
+                const label = latest?.air_quality_status || 'No readings';
+                level.className = `status-pill ${label.toLowerCase().replaceAll(' ', '-')}`;
+                level.textContent = label;
+                currentSmall.replaceChildren(level, document.createTextNode(latest ? ` · ${formatTime(latest.recorded_at)}` : ''));
             }
 
             const updatedAt = new Date().toLocaleTimeString();
