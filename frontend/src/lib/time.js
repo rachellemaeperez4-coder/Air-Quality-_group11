@@ -1,9 +1,21 @@
 const PHILIPPINE_TIME_ZONE = "Asia/Manila";
 
+export function parseReadingTime(value) {
+  if (!value) return null;
+  // Postgres timestamp columns without a zone can arrive as ISO strings with
+  // no offset. Sensor ingestion uses the database clock (UTC), so interpret
+  // those values as UTC before converting them for display.
+  const timestamp = typeof value === "string"
+    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(value)
+    ? `${value}Z`
+    : value;
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 export function formatReadingTime(value) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
+  const date = parseReadingTime(value);
+  if (!date) return "—";
 
   return date.toLocaleString("en-PH", {
     timeZone: PHILIPPINE_TIME_ZONE,

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../../lib/api";
-import { formatReadingTime, startOfPhilippineDay } from "../../lib/time";
+import { formatReadingTime, parseReadingTime, startOfPhilippineDay } from "../../lib/time";
 import UserLayout from "../../components/UserLayout";
 
 const formatTime = (value) => value ? formatReadingTime(value) : "—";
@@ -71,10 +71,10 @@ function UserDashboard() {
   const chartPoints = useMemo(() => {
     if (!data) return [];
     const now = data.trend?.[0]?.recorded_at
-      ? new Date(data.trend[0].recorded_at).getTime()
-      : data.latest?.recorded_at ? new Date(data.latest.recorded_at).getTime() : 0;
+      ? parseReadingTime(data.trend[0].recorded_at)?.getTime() || 0
+      : data.latest?.recorded_at ? parseReadingTime(data.latest.recorded_at)?.getTime() || 0 : 0;
     const cutoff = range === "today" ? startOfPhilippineDay() : now - (range === "7days" ? 7 : 30) * 86400000;
-    return (data.trend || []).filter((row) => row.sensor_value !== null && new Date(row.recorded_at).getTime() >= cutoff).slice().reverse();
+    return (data.trend || []).filter((row) => row.sensor_value !== null && (parseReadingTime(row.recorded_at)?.getTime() || 0) >= cutoff).slice().reverse();
   }, [data, range]);
 
   const latest = data?.latest;
