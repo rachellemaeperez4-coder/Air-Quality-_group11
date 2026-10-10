@@ -107,6 +107,7 @@ function StaffLayout({ account, module, children }) {
   }, [theme]);
 
   async function signOut() {
+    try { await apiRequest("/api/user/activity-logs", { activity_type: "sign_out" }); } catch { /* Sign-out must still work if logging is unavailable. */ }
     await getSupabaseClient().auth.signOut();
     clearRoleVerification();
     navigate("/");

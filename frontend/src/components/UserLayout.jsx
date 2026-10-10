@@ -15,6 +15,7 @@ function UserLayout({ account, page, children }) {
   }, [page]);
 
   async function signOut() {
+    try { await apiRequest("/api/user/activity-logs", { activity_type: "sign_out" }); } catch { /* Sign-out must still work if logging is unavailable. */ }
     await getSupabaseClient().auth.signOut();
     navigate("/");
   }

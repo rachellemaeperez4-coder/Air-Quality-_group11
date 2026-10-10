@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
-const { authenticate } = require("./authenticate");
+const { authenticate, supabaseForToken } = require("./authenticate");
 const staffRouter = require("./routes/staff");
 const userRouter = require("./routes/user");
 
@@ -138,7 +138,7 @@ app.post("/api/auth/login", async (req, res) => {
 
     const { data: profile, error: profileError } = await supabase
       .from("users")
-      .select("role, account_status")
+      .select("user_id, auth_user_id, role, account_status")
       .eq("auth_user_id", data.user.id)
       .single();
 
@@ -153,6 +153,19 @@ app.post("/api/auth/login", async (req, res) => {
     }
     if (String(profile.account_status || "").trim().toLowerCase() !== "active") {
       return res.status(403).json({ error: "This account is disabled. Contact your administrator." });
+    }
+
+    try {
+      const userSupabase = supabaseForToken(data.session.access_token);
+      const { error: activityError } = await userSupabase.from("user_activity_logs").insert({
+        user_id: profile.user_id,
+        auth_user_id: profile.auth_user_id,
+        activity_type: "sign_in",
+        description: "Signed in.",
+      });
+      if (activityError) console.error("Sign-in activity log failed:", activityError.message);
+    } catch (activityError) {
+      console.error("Sign-in activity log failed:", activityError.message);
     }
 
     res.json({
