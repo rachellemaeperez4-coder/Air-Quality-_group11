@@ -9,17 +9,23 @@ const PAGE_ACTIVITY = {
   readings: "Viewed sensor readings.",
   alerts: "Viewed air-quality alerts.",
 };
+const ACTIVITY_DESCRIPTIONS = {
+  ...PAGE_ACTIVITY,
+  sign_in: "Signed in.",
+  sign_out: "Signed out.",
+};
 
 router.post("/activity-logs", authenticate(), async (req, res) => {
   try {
     const activityType = String(req.body?.activity_type || "");
     const isPageVisit = Object.hasOwn(PAGE_ACTIVITY, activityType) && req.account.role === "user";
-    if (!isPageVisit && activityType !== "sign_out") return res.status(400).json({ error: "Select a supported activity type." });
+    const isSessionEvent = ["sign_in", "sign_out"].includes(activityType);
+    if (!isPageVisit && !isSessionEvent) return res.status(400).json({ error: "Select a supported activity type." });
     const { error } = await req.supabase.from("user_activity_logs").insert({
       user_id: req.account.user_id,
       auth_user_id: req.account.auth_user_id,
-      activity_type: isPageVisit ? `${activityType}_view` : "sign_out",
-      description: isPageVisit ? PAGE_ACTIVITY[activityType] : "Signed out.",
+      activity_type: isPageVisit ? `${activityType}_view` : activityType,
+      description: ACTIVITY_DESCRIPTIONS[activityType],
     });
     if (error) throw error;
     res.status(201).json({ message: "Activity recorded." });

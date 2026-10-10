@@ -79,6 +79,12 @@ function Login({ onClose }: LoginProps) {
       const { error } = await getSupabaseClient().auth.setSession(result.session);
       if (error) throw error;
 
+      try {
+        await apiRequest("/api/user/activity-logs", { activity_type: "sign_in" });
+      } catch (activityError) {
+        console.error("Sign-in activity could not be recorded:", activityError);
+      }
+
       setMessage("Login successful.");
       window.location.assign(actualRole === "staff" ? "/staff/dashboard" : "/user/dashboard");
     } catch (error: unknown) {

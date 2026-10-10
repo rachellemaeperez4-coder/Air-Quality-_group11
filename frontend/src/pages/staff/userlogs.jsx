@@ -31,7 +31,7 @@ export default function StaffUserLogs() {
     <StaffLayout account={data?.account} module="userlogs">
       <main className="content">
         <section className="page-heading">
-          <div><span className="eyebrow">System administration</span><h1>User activity</h1><p>Review recent user page visits recorded by the application.</p></div>
+          <div><span className="eyebrow">System administration</span><h1>User activity</h1><p>Review user and staff sign-ins, sign-outs, and page visits.</p></div>
           <button className="button secondary" type="button" onClick={refresh} disabled={refreshing}>{refreshing ? "Refreshing…" : "Refresh"}</button>
         </section>
         {error && <p className="error" role="alert">{error}</p>}
