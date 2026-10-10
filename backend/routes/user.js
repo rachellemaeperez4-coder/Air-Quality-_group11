@@ -4,6 +4,29 @@ const { getThresholds, qualityStatus, statusClass } = require('../air-quality');
 
 const router = express.Router();
 
+const PAGE_ACTIVITY = {
+  dashboard: "Viewed the user dashboard.",
+  readings: "Viewed sensor readings.",
+  alerts: "Viewed air-quality alerts.",
+};
+
+router.post("/activity-logs", authenticate("user"), async (req, res) => {
+  try {
+    const activityType = String(req.body?.activity_type || "");
+    if (!Object.hasOwn(PAGE_ACTIVITY, activityType)) return res.status(400).json({ error: "Select a supported activity type." });
+    const { error } = await req.supabase.from("user_activity_logs").insert({
+      user_id: req.account.user_id,
+      auth_user_id: req.account.auth_user_id,
+      activity_type: `${activityType}_view`,
+      description: PAGE_ACTIVITY[activityType],
+    });
+    if (error) throw error;
+    res.status(201).json({ message: "Activity recorded." });
+  } catch (error) {
+    res.status(503).json({ error: "User activity could not be recorded. Check the activity log SQL migration." });
+  }
+});
+
 router.get("/dashboard", authenticate("user"), async (req, res) => {
   try {
     const supabase = req.supabase;

@@ -15,6 +15,7 @@ const StaffAccounts = lazy(() => import("./pages/staff/accounts"));
 const StaffThresholds = lazy(() => import("./pages/staff/thresholds"));
 const StaffReadings = lazy(() => import("./pages/staff/readings"));
 const StaffAudit = lazy(() => import("./pages/staff/audit"));
+const StaffUserLogs = lazy(() => import("./pages/staff/userlogs"));
 const RequireRole = lazy(() => import("./components/RequireRole"));
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
       <Route path="/staff/thresholds" element={<RequireRole role="staff"><StaffThresholds /></RequireRole>} />
       <Route path="/staff/readings" element={<RequireRole role="staff"><StaffReadings /></RequireRole>} />
       <Route path="/staff/audit" element={<RequireRole role="staff"><StaffAudit /></RequireRole>} />
+      <Route path="/staff/userlogs" element={<RequireRole role="staff"><StaffUserLogs /></RequireRole>} />
       <Route path="/staff/:module" element={<RequireRole role="staff"><StaffConsole /></RequireRole>} />
       <Route path="*" element={<Home />} />
     </Routes>

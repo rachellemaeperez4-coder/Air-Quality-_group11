@@ -70,6 +70,32 @@ router.get("/latest-readings", async (req, res) => {
   }
 });
 
+router.get("/user-activity-logs", async (req, res) => {
+  try {
+    const { data: logs, error } = await req.supabase
+      .from("user_activity_logs")
+      .select("log_id,user_id,auth_user_id,activity_type,description,created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw error;
+
+    const userIds = [...new Set((logs || []).map((log) => log.user_id).filter((id) => id !== null))];
+    let usersById = new Map();
+    if (userIds.length) {
+      const { data: users, error: usersError } = await req.supabase.from("users").select("user_id,name,email").in("user_id", userIds);
+      if (usersError) throw usersError;
+      usersById = new Map((users || []).map((user) => [user.user_id, user]));
+    }
+    const rows = (logs || []).map((log) => {
+      const user = usersById.get(log.user_id);
+      return { ...log, user_name: user?.name || null, user_email: user?.email || null };
+    });
+    res.set("Cache-Control", "no-store").json({ rows, account: { name: req.account.name, email: req.account.email } });
+  } catch (error) {
+    fail(res, error);
+  }
+});
+
 router.get("/:module", async (req, res) => {
   const module = req.params.module;
   const supabase = req.supabase;

@@ -1,10 +1,18 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getSupabaseClient } from "../lib/supabase";
+import { apiRequest } from "../lib/api";
 import "../../../style.css";
 import "../css/UserPages.css";
 
 function UserLayout({ account, page, children }) {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (["dashboard", "readings", "alerts"].includes(page)) {
+      apiRequest("/api/user/activity-logs", { activity_type: page }).catch(() => {});
+    }
+  }, [page]);
 
   async function signOut() {
     await getSupabaseClient().auth.signOut();

@@ -16,6 +16,7 @@ const links = [
   ["settings", "Thresholds", "/staff/thresholds"],
   ["readings", "Readings", "/staff/readings"],
   ["audit", "Alert history", "/staff/audit"],
+  ["userlogs", "User activity", "/staff/userlogs"],
 ];
 
 function StaffReadingAlert() {
