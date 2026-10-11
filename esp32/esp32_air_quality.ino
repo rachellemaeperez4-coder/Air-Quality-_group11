@@ -53,6 +53,9 @@ portMUX_TYPE readingMux = portMUX_INITIALIZER_UNLOCKED;
 volatile int sharedRaw = 0;
 volatile uint8_t sharedLevel = GOOD;
 volatile bool sharedReady = false;
+// Keep the latest Moderate transition until an upload succeeds.
+int sharedModerateRaw = 0;
+uint32_t sharedModerateVersion = 0;
 int sharedGoodMax = DEFAULT_GOOD_MAX;
 int sharedModerateMax = DEFAULT_MODERATE_MAX;
 int sharedHazardousMax = DEFAULT_HAZARDOUS_MAX;
@@ -266,6 +269,7 @@ void uploadTask(void*) {
   unsigned long lastUpload = 0;
   unsigned long lastAttempt = 0;
   bool hasUploaded = false;
+  uint32_t uploadedModerateVersion = 0;
   bool wasConnected = false;
   bool attemptedThresholdRefresh = false;
   unsigned long lastThresholdRefresh = 0;
@@ -297,19 +301,28 @@ void uploadTask(void*) {
       bool ready;
       int uploadRaw;
       uint8_t uploadLevel;
+      int moderateRaw;
+      uint32_t moderateVersion;
       portENTER_CRITICAL(&readingMux);
       ready = sharedReady;
       uploadRaw = sharedRaw;
       uploadLevel = sharedLevel;
+      moderateRaw = sharedModerateRaw;
+      moderateVersion = sharedModerateVersion;
       portEXIT_CRITICAL(&readingMux);
 
-      if (ready
+      bool pendingModerate = moderateVersion != uploadedModerateVersion;
+      bool moderateUploadDue = pendingModerate
+          && (lastAttempt == 0 || now - lastAttempt >= (hasUploaded ? UPLOAD_INTERVAL_MS : 5000));
+      if (moderateUploadDue || (ready
           && ((!hasUploaded && (lastAttempt == 0 || now - lastAttempt >= 5000))
-              || (hasUploaded && now - lastUpload >= UPLOAD_INTERVAL_MS))) {
+              || (hasUploaded && now - lastUpload >= UPLOAD_INTERVAL_MS)))) {
         lastAttempt = now;
-        if (sendReading(uploadRaw, uploadStatusName(uploadLevel))) {
+        if (sendReading(pendingModerate ? moderateRaw : uploadRaw,
+                        uploadStatusName(pendingModerate ? MODERATE : uploadLevel))) {
           lastUpload = now;
           hasUploaded = true;
+          if (pendingModerate) uploadedModerateVersion = moderateVersion;
         } else {
           hasUploaded = false;
         }
@@ -372,6 +385,10 @@ void loop() {
     level = classifyReading(sensorValue, goodMax, moderateMax, hazardousMax);
 
     portENTER_CRITICAL(&readingMux);
+    if (level == MODERATE && (!sharedReady || sharedLevel != MODERATE)) {
+      sharedModerateRaw = sensorValue;
+      sharedModerateVersion++;
+    }
     sharedRaw = sensorValue;
     sharedLevel = level;
     sharedReady = true;

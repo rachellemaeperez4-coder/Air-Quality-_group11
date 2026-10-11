@@ -55,6 +55,9 @@ portMUX_TYPE readingMux = portMUX_INITIALIZER_UNLOCKED;
 volatile int sharedRaw = 0;
 volatile uint8_t sharedLevel = GOOD;
 volatile bool sharedReady = false;
+// Capture in the sensor loop, including while HTTPS blocks the upload task.
+int sharedModerateRaw = 0;
+uint32_t sharedModerateVersion = 0;
 int sharedGoodMax = DEFAULT_GOOD_MAX;
 int sharedModerateMax = DEFAULT_MODERATE_MAX;
 int sharedHazardousMax = DEFAULT_HAZARDOUS_MAX;
@@ -302,6 +305,7 @@ void uploadTask(void*) {
   unsigned long lastUpload = 0;
   unsigned long lastAttempt = 0;
   bool hasUploaded = false;
+  uint32_t uploadedModerateVersion = 0;
   bool pendingHazardReading = false;
   int pendingHazardRaw = 0;
   uint8_t pendingHazardLevel = GOOD;
@@ -326,10 +330,14 @@ void uploadTask(void*) {
     bool ready;
     int uploadRaw;
     uint8_t uploadLevel;
+    int moderateRaw;
+    uint32_t moderateVersion;
     portENTER_CRITICAL(&readingMux);
     ready = sharedReady;
     uploadRaw = sharedRaw;
     uploadLevel = sharedLevel;
+    moderateRaw = sharedModerateRaw;
+    moderateVersion = sharedModerateVersion;
     portEXIT_CRITICAL(&readingMux);
 
     if (ready) {
@@ -359,15 +367,20 @@ void uploadTask(void*) {
               || (hasUploaded && now - lastUpload >= UPLOAD_INTERVAL_MS));
       bool hazardRetryDue = pendingHazardReading
           && (lastAttempt == 0 || now - lastAttempt >= 5000);
+      bool pendingModerate = moderateVersion != uploadedModerateVersion;
+      bool moderateUploadDue = pendingModerate
+          && (lastAttempt == 0 || now - lastAttempt >= (hasUploaded ? UPLOAD_INTERVAL_MS : 5000));
 
-      if (regularUploadDue || hazardRetryDue) {
+      if (regularUploadDue || hazardRetryDue || moderateUploadDue) {
         lastAttempt = now;
-        int valueToUpload = pendingHazardReading ? pendingHazardRaw : uploadRaw;
-        uint8_t levelToUpload = pendingHazardReading ? pendingHazardLevel : uploadLevel;
+        bool uploadingModerate = !pendingHazardReading && pendingModerate;
+        int valueToUpload = pendingHazardReading ? pendingHazardRaw : (uploadingModerate ? moderateRaw : uploadRaw);
+        uint8_t levelToUpload = pendingHazardReading ? pendingHazardLevel : (uploadingModerate ? MODERATE : uploadLevel);
         if (sendReading(valueToUpload, uploadStatusName(levelToUpload))) {
           lastUpload = now;
           hasUploaded = true;
           if (pendingHazardReading) pendingHazardReading = false;
+          if (uploadingModerate) uploadedModerateVersion = moderateVersion;
         } else {
           hasUploaded = false;
         }
@@ -430,6 +443,10 @@ void loop() {
     level = classifyReading(sensorValue, goodMax, moderateMax, hazardousMax);
 
     portENTER_CRITICAL(&readingMux);
+    if (level == MODERATE && (!sharedReady || sharedLevel != MODERATE)) {
+      sharedModerateRaw = sensorValue;
+      sharedModerateVersion++;
+    }
     sharedRaw = sensorValue;
     sharedLevel = level;
     sharedReady = true;
