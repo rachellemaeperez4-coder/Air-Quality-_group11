@@ -21,7 +21,7 @@ const char* THRESHOLDS_URL = "https://hkcrlikntizjmrtonwuc.supabase.co/rest/v1/a
 
 const int ZONE_ID = 2;
 const int DEVICE_ID = 6;
-const unsigned long UPLOAD_INTERVAL_MS = 60000;
+const unsigned long UPLOAD_INTERVAL_MS = 2000;
 
 // ---- CONFIG ----
 const int SENSOR_PIN = 34;
