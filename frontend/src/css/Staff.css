@@ -87,8 +87,8 @@
 :root[data-theme="light"] .staff-app button.button.secondary:hover:not(:disabled){background:#dfeaf0}
 
 .staff-app .overview-stat .current-reading-status{display:inline-flex;margin-top:2px}
-.staff-app .overview-stat .current-reading-value{display:flex;align-items:center;gap:16px}
-.staff-app .current-reading-glow{display:inline-block;flex:none;width:14px;height:14px;border-radius:50%;background:currentColor}
+.staff-app .current-reading-card{position:relative;padding-right:100px}
+.staff-app .current-reading-glow{position:absolute;right:38px;top:50%;transform:translateY(-50%);display:inline-block;width:26px;height:26px;border-radius:50%;background:currentColor}
 .staff-app .current-reading-glow.status-good{color:var(--good)}
 .staff-app .current-reading-glow.status-moderate{color:var(--warn)}
 .staff-app .current-reading-glow.status-hazard{color:var(--bad)}
