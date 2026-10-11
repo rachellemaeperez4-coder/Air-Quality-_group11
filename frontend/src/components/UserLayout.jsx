@@ -29,7 +29,6 @@ function UserLayout({ account, page, children }) {
           <Link className="nav-link" aria-current={page === "dashboard" ? "page" : undefined} to="/user/dashboard">Overview</Link>
           <Link className="nav-link" aria-current={page === "readings" ? "page" : undefined} to="/user/readings">Readings</Link>
           <Link className="nav-link" aria-current={page === "alerts" ? "page" : undefined} to="/user/alerts">Alerts</Link>
-          <a className="nav-link" href={page === "dashboard" ? "#status-guide" : "/user/dashboard#status-guide"}>Status guide</a>
         </nav>
         <div className="sidebar-spacer" />
         <div className="access-card"><div className="access-label"><span className="access-dot" />Readings access</div><p>Viewing the latest readings shared with your account.</p></div>
