@@ -11,9 +11,9 @@
 
 .app-shell:not(.staff-app) .dashboard-content .reading-status-value {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .app-shell:not(.staff-app) .dashboard-content .reading-status-value strong {
@@ -23,10 +23,30 @@
 }
 
 .app-shell:not(.staff-app) .dashboard-content .user-reading-card {
+  --card: #102435;
+  --line: #1c3547;
+  --good: #4fd08a;
+  --good-bg: rgb(79 208 138 / .12);
+  --warn: #f0b84a;
+  --warn-bg: rgb(240 184 74 / .13);
+  --bad: #ef7373;
+  --bad-bg: rgb(239 115 115 / .12);
   position: relative;
   padding-right: 90px;
+  border-radius: 12px;
+  background: var(--card);
+  color: #e4eef5;
   transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
 }
+.app-shell:not(.staff-app) .dashboard-content .user-reading-card .card-top h2 {
+  color: #a9bfce;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.app-shell:not(.staff-app) .dashboard-content .user-reading-card .card-note { color: #a9bfce; }
+.app-shell:not(.staff-app) .dashboard-content .user-reading-card .status-badge { text-transform: uppercase; }
 .user-reading-card.status-good { --reading-color: var(--good); }
 .user-reading-card.status-moderate { --reading-color: var(--warn); }
 .user-reading-card.status-hazard { --reading-color: var(--bad); }
