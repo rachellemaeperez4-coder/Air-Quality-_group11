@@ -28,6 +28,13 @@ function StaffReadingAlert() {
   })());
   const initialized = useRef(latestReadingId.current !== null);
   const [queue, setQueue] = useState([]);
+  const [coolingDown, setCoolingDown] = useState(false);
+
+  useEffect(() => {
+    if (!coolingDown) return;
+    const timer = window.setTimeout(() => setCoolingDown(false), 3000);
+    return () => window.clearTimeout(timer);
+  }, [coolingDown]);
 
   useEffect(() => {
     let active = true;
@@ -66,7 +73,7 @@ function StaffReadingAlert() {
     }
 
     checkForReadings();
-    const interval = window.setInterval(checkForReadings, 5000);
+    const interval = window.setInterval(checkForReadings, 1000);
     return () => {
       active = false;
       window.clearInterval(interval);
@@ -74,7 +81,7 @@ function StaffReadingAlert() {
   }, []);
 
   const reading = queue[0];
-  if (!reading) return null;
+  if (!reading || coolingDown) return null;
 
   const status = String(reading.air_quality_status || "Unknown");
   return (
@@ -85,7 +92,7 @@ function StaffReadingAlert() {
         <h2 id="staff-reading-alert-title">{status} air quality</h2>
         <p id="staff-reading-alert-description">The latest sensor reading is <strong>{reading.mq135_value ?? "—"}</strong>. Please check the monitoring zone.</p>
         <p className="staff-reading-alert-time">Reading #{reading.reading_id}{reading.recorded_at ? ` · ${formatReadingTime(reading.recorded_at)}` : ""}</p>
-        <button className="button" type="button" onClick={() => setQueue((current) => current.slice(1))}>Acknowledge</button>
+        <button className="button" type="button" onClick={() => { setCoolingDown(true); setQueue((current) => current.slice(1)); }}>Acknowledge</button>
       </section>
     </div>
   );

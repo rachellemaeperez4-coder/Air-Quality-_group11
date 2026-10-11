@@ -11,7 +11,14 @@ function ReadingAlert({ readings }) {
   const dialog = useRef(null);
   const seen = useRef(new Set());
   const [queue, setQueue] = useState([]);
+  const [coolingDown, setCoolingDown] = useState(false);
   const reading = queue[0];
+
+  useEffect(() => {
+    if (!coolingDown) return;
+    const timer = window.setTimeout(() => setCoolingDown(false), 3000);
+    return () => window.clearTimeout(timer);
+  }, [coolingDown]);
 
   useEffect(() => {
     const alerts = [...readings].sort((a, b) => Number(a.reading_id) - Number(b.reading_id)).filter((row) => {
@@ -27,16 +34,16 @@ function ReadingAlert({ readings }) {
   }, [readings]);
 
   useEffect(() => {
-    if (!reading) return;
+    if (!reading || coolingDown) return;
     const id = String(reading.reading_id || "");
     if (!id) return;
     try {
       sessionStorage.setItem("airsense-last-alert-reading", id);
     } catch { /* Alert display still works if session storage is unavailable. */ }
     if (dialog.current && !dialog.current.open) dialog.current.showModal();
-  }, [reading]);
+  }, [reading, coolingDown]);
 
-  return <dialog className="reading-alert-dialog" ref={dialog} onClose={() => setQueue((current) => current.slice(1))} data-level={reading?.status.toLowerCase().replaceAll(" ", "-")}><h2>Air quality alert</h2><p>Recorded reading is <strong>{reading?.status}</strong>.</p><p>Sensor value: {formatValue(reading?.sensor_value)}</p><p>{reading?.recorded_at ? `Recorded ${formatTime(reading.recorded_at)}` : ""}</p><form method="dialog"><button className="button">Dismiss</button></form></dialog>;
+  return <dialog className="reading-alert-dialog" ref={dialog} onClose={() => { setCoolingDown(true); setQueue((current) => current.slice(1)); }} data-level={reading?.status.toLowerCase().replaceAll(" ", "-")}><h2>Air quality alert</h2><p>Recorded reading is <strong>{reading?.status}</strong>.</p><p>Sensor value: {formatValue(reading?.sensor_value)}</p><p>{reading?.recorded_at ? `Recorded ${formatTime(reading.recorded_at)}` : ""}</p><form method="dialog"><button className="button">Dismiss</button></form></dialog>;
 }
 
 function UserDashboard() {
