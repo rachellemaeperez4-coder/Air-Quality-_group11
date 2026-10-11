@@ -1,6 +1,6 @@
 const express = require("express");
 const { authenticate } = require("../authenticate");
-const { getThresholds } = require("../air-quality");
+const { getThresholds, qualityStatus, statusClass } = require("../air-quality");
 
 const router = express.Router();
 router.use(authenticate("staff"));
@@ -112,7 +112,7 @@ router.get("/:module", async (req, res) => {
     }
     if (module === "readings") {
       const page = Math.max(1, Math.min(100000, Number.parseInt(req.query.page, 10) || 1));
-      const pageSize = 50;
+      const pageSize = 10;
       const date = String(req.query.date || "");
       let query = supabase.from("air_quality_readings").select("reading_id,zone_id,device_id,sensor_id,mq135_value,air_quality_status,recorded_at", { count: "exact" });
       if (date && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(`${date}T00:00:00Z`))) {
@@ -125,8 +125,13 @@ router.get("/:module", async (req, res) => {
         supabase.from("sensors").select("sensor_id,sensor_name"),
       ]);
       if (devicesError || sensorsError) throw devicesError || sensorsError;
-      const { data: limits } = await getThresholds(supabase);
-      return res.json({ rows: data || [], total: count || 0, page, page_size: pageSize, has_next: page * pageSize < (count || 0), devices: devices || [], sensors: sensors || [], thresholds: limits, date, account: { name: req.account.name, email: req.account.email } });
+      const { data: limits, error: limitsError } = await getThresholds(supabase);
+      if (limitsError) throw limitsError;
+      const rows = (data || []).map((row) => {
+        const status = qualityStatus(row.mq135_value, limits);
+        return { ...row, status, status_class: statusClass(status) };
+      });
+      return res.json({ rows, total: count || 0, page, page_size: pageSize, has_next: page * pageSize < (count || 0), devices: devices || [], sensors: sensors || [], thresholds: limits, date, account: { name: req.account.name, email: req.account.email } });
     }
 
     const table = module === "users" ? "users" : module;

@@ -28,6 +28,7 @@ function StaffConsole({ section: requestedSection }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [editing, setEditing] = useState(null);
   const [draft, setDraft] = useState({});
   const [filters, setFilters] = useState({ date: "", page: 1 });
@@ -41,6 +42,20 @@ function StaffConsole({ section: requestedSection }) {
     setData(result);
     setError("");
     if (module === "settings" && result.thresholds) setThresholdDraft(result.thresholds);
+  }
+
+  async function refreshReadings() {
+    setRefreshing(true);
+    setError("");
+    setNotice("");
+    try {
+      await load();
+      setNotice("Readings refreshed.");
+    } catch (requestError) {
+      setError(requestError.message || "Readings could not be refreshed.");
+    } finally {
+      setRefreshing(false);
+    }
   }
 
   useEffect(() => {
@@ -123,7 +138,7 @@ function StaffConsole({ section: requestedSection }) {
           {filteredAccounts.length > 5 && <div className="pagination"><button className="button secondary" disabled={currentAccountPage <= 1} onClick={() => setAccountPage((page) => Math.max(1, page - 1))}>Previous</button><span>Page {currentAccountPage} of {accountPageCount}</span><button className="button secondary" disabled={currentAccountPage >= accountPageCount} onClick={() => setAccountPage((page) => Math.min(accountPageCount, page + 1))}>Next</button></div>}
         </section>}
 
-        {module === "readings" && <section className="section"><div className="section-head"><div><h2>Stored readings</h2><p>{data ? `${data.total} total · 50 per page` : "Loading readings…"}</p></div><button className="button secondary" onClick={exportCsv}>Export CSV</button></div><div className="section-body staff-toolbar"><label>Filter by date<input type="date" value={filters.date} onChange={(event) => setFilters({ date: event.target.value, page: 1 })} /></label><button className="button secondary" onClick={() => setFilters({ date: "", page: 1 })}>Clear date</button></div><div className="table-scroll"><table><thead><tr><th>ID</th><th>Device</th><th>Sensor</th><th>MQ-2 value</th><th>Recorded</th><th>Action</th></tr></thead><tbody>{readingsRows.map((row) => <tr key={row.reading_id}><td>#{row.reading_id}</td><td>{data.devices.find((device) => device.device_id === row.device_id)?.device_name || `Device ${row.device_id || "—"}`}</td><td>{data.sensors.find((sensor) => sensor.sensor_id === row.sensor_id)?.sensor_name || `Sensor ${row.sensor_id || "—"}`}</td><td>{row.mq135_value ?? "—"}</td><td>{showTime(row.recorded_at)}</td><td><button className="button danger" onClick={() => window.confirm(`Permanently delete reading #${row.reading_id}?`) && mutate(`/api/staff/readings/${row.reading_id}`, undefined, "DELETE")}>Delete</button></td></tr>)}{data && !data.rows.length && <tr><td className="empty-cell" colSpan="6">No readings are available.</td></tr>}</tbody></table></div><div className="pagination"><button className="button secondary" disabled={filters.page <= 1} onClick={() => setFilters({ ...filters, page: filters.page - 1 })}>Previous</button><span>Page {filters.page}</span><button className="button secondary" disabled={!data?.has_next} onClick={() => setFilters({ ...filters, page: filters.page + 1 })}>Next</button></div></section>}
+        {module === "readings" && <section className="section"><div className="section-head"><div><h2>Stored readings</h2><p>{data ? `${data.total} total · 10 per page` : "Loading readings…"}</p></div><div className="row-actions"><button className="button secondary" type="button" onClick={refreshReadings} disabled={refreshing}>{refreshing ? "Refreshing…" : "Refresh"}</button><button className="button secondary" type="button" onClick={exportCsv}>Export CSV</button></div></div><div className="section-body staff-toolbar"><label>Filter by date<input type="date" value={filters.date} onChange={(event) => setFilters({ date: event.target.value, page: 1 })} /></label><button className="button secondary" onClick={() => setFilters({ date: "", page: 1 })}>Clear date</button></div><div className="table-scroll"><table><thead><tr><th>ID</th><th>Device</th><th>Sensor</th><th>MQ-2 value</th><th>Quality</th><th>Recorded</th><th>Action</th></tr></thead><tbody>{readingsRows.map((row) => <tr key={row.reading_id}><td>#{row.reading_id}</td><td>{data.devices.find((device) => device.device_id === row.device_id)?.device_name || `Device ${row.device_id || "—"}`}</td><td>{data.sensors.find((sensor) => sensor.sensor_id === row.sensor_id)?.sensor_name || `Sensor ${row.sensor_id || "—"}`}</td><td>{row.mq135_value ?? "—"}</td><td><span className={`status-badge ${row.status_class || "status-neutral"}`}>{(row.status || "Unknown").toUpperCase()}</span></td><td>{showTime(row.recorded_at)}</td><td><button className="button danger" onClick={() => window.confirm(`Permanently delete reading #${row.reading_id}?`) && mutate(`/api/staff/readings/${row.reading_id}`, undefined, "DELETE")}>Delete</button></td></tr>)}{data && !data.rows.length && <tr><td className="empty-cell" colSpan="7">No readings are available.</td></tr>}</tbody></table></div><div className="pagination"><button className="button secondary" disabled={filters.page <= 1} onClick={() => setFilters({ ...filters, page: filters.page - 1 })}>Previous</button><span>Page {filters.page} of {Math.max(1, Math.ceil((data?.total || 0) / 10))}</span><button className="button secondary" disabled={!data?.has_next} onClick={() => setFilters({ ...filters, page: filters.page + 1 })}>Next</button></div></section>}
 
         {module === "audit" && <section className="section"><div className="section-head"><div><h2>Alert history</h2><p>{data?.notice || "Records stored in the existing alerts table."}</p></div></div><div className="table-scroll"><table><thead><tr><th>Created</th><th>Type</th><th>Severity</th><th>Status</th><th>Zone</th><th>Device</th><th>Message</th></tr></thead><tbody>{(data?.rows || []).map((row) => <tr key={row.alert_id}><td>{showTime(row.created_at)}</td><td>{row.alert_type}</td><td>{row.severity}</td><td>{row.status}</td><td>{row.zone_id}</td><td>{row.device_id}</td><td>{row.message}</td></tr>)}{data && !data.rows.length && <tr><td className="empty-cell" colSpan="7">No alert history is available.</td></tr>}</tbody></table></div></section>}
         <p className="footnote">Staff changes are enforced by Supabase row-level security.</p>
