@@ -88,6 +88,11 @@
 
 .staff-app .overview-stat .current-reading-status{display:inline-flex;margin-top:2px}
 .staff-app .current-reading-card{position:relative;padding-right:100px}
+.staff-app .overview-stat.current-reading-card{transition:background-color .3s ease,border-color .3s ease,box-shadow .3s ease}
+.staff-app .overview-stat.current-reading-card.status-good{--reading-color:var(--good)}
+.staff-app .overview-stat.current-reading-card.status-moderate{--reading-color:var(--warn)}
+.staff-app .overview-stat.current-reading-card.status-hazard{--reading-color:var(--bad)}
+.staff-app .overview-stat.current-reading-card:not(.status-neutral){background:color-mix(in srgb,var(--reading-color) 20%,var(--card));border-color:color-mix(in srgb,var(--reading-color) 65%,var(--line));box-shadow:0 0 20px color-mix(in srgb,var(--reading-color) 18%,transparent)}
 .staff-app .current-reading-glow{position:absolute;right:38px;top:50%;transform:translateY(-50%);display:inline-block;width:26px;height:26px;border-radius:50%;background:currentColor}
 .staff-app .current-reading-glow.status-good{color:var(--good)}
 .staff-app .current-reading-glow.status-moderate{color:var(--warn)}

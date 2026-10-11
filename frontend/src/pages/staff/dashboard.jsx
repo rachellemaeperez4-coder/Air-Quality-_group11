@@ -69,7 +69,7 @@ function StaffDashboard() {
             ["Current MQ-2 reading", data?.readings?.[0]?.mq135_value],
             ["Total accounts", data?.counts?.users],
           ].map(([label, value]) => (
-            <article className={`overview-stat${label === "Current MQ-2 reading" ? " current-reading-card" : ""}`} key={label}>
+            <article className={`overview-stat${label === "Current MQ-2 reading" ? ` current-reading-card ${currentQualityClass}` : ""}`} key={label}>
               <span>{label}</span>
               <strong className={label === "Current MQ-2 reading" ? "current-reading-value" : undefined}>
                 {value ?? "—"}
