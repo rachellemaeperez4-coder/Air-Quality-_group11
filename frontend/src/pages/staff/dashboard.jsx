@@ -48,6 +48,8 @@ function StaffDashboard() {
     };
   }, []);
 
+  const currentQualityClass = qualityClasses[data?.readings?.[0]?.air_quality_status?.trim().toLowerCase()] || "status-neutral";
+
   return (
     <StaffLayout account={data?.account} module="dashboard">
       <main className="content">
@@ -64,10 +66,13 @@ function StaffDashboard() {
           ].map(([label, value]) => (
             <article className="overview-stat" key={label}>
               <span>{label}</span>
-              <strong>{value ?? "—"}</strong>
+              <strong className={label === "Current MQ-2 reading" ? "current-reading-value" : undefined}>
+                {value ?? "—"}
+                {label === "Current MQ-2 reading" && <i className={`current-reading-glow ${currentQualityClass}`} aria-hidden="true" />}
+              </strong>
               <small>{label === "Current MQ-2 reading"
                 ? data?.readings?.[0]
-                  ? <span className={`status-badge current-reading-status ${qualityClasses[data.readings[0].air_quality_status?.trim().toLowerCase()] || "status-neutral"}`}>
+                  ? <span className={`status-badge current-reading-status ${currentQualityClass}`}>
                       {(data.readings[0].air_quality_status || "Unknown").toUpperCase()}
                     </span>
                   : "No readings received yet"

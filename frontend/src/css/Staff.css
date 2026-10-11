@@ -87,6 +87,13 @@
 :root[data-theme="light"] .staff-app button.button.secondary:hover:not(:disabled){background:#dfeaf0}
 
 .staff-app .overview-stat .current-reading-status{display:inline-flex;margin-top:2px}
+.staff-app .overview-stat .current-reading-value{display:flex;align-items:center;gap:16px}
+.staff-app .current-reading-glow{display:inline-block;flex:none;width:14px;height:14px;border-radius:50%;background:currentColor}
+.staff-app .current-reading-glow.status-good{color:var(--good)}
+.staff-app .current-reading-glow.status-moderate{color:var(--warn)}
+.staff-app .current-reading-glow.status-hazard{color:var(--bad)}
+.staff-app .current-reading-glow:not(.status-neutral){box-shadow:0 0 8px 2px currentColor,0 0 22px 5px color-mix(in srgb,currentColor 45%,transparent)}
+.staff-app .current-reading-glow.status-neutral{color:var(--muted)}
 .staff-app .overview-stat .current-reading-status.status-good{color:var(--good);background:var(--good-bg)}
 .staff-app .overview-stat .current-reading-status.status-moderate{color:var(--warn);background:var(--warn-bg)}
 .staff-app .overview-stat .current-reading-status.status-hazard{color:var(--bad);background:var(--bad-bg)}
