@@ -52,6 +52,7 @@ function UserDashboard() {
     let timer;
 
     async function refresh(initial = false) {
+      const refreshStarted = Date.now();
       try {
         const firstLoad = initial || !loaded;
         const path = firstLoad ? "/api/user/dashboard" : `/api/user/dashboard?after_id=${encodeURIComponent(lastId.current)}`;
@@ -77,7 +78,7 @@ function UserDashboard() {
       } catch (requestError) {
         if (active) setError(requestError.message);
       } finally {
-        if (active) timer = window.setTimeout(() => refresh(false), 3000);
+        if (active) timer = window.setTimeout(() => refresh(false), Math.max(0, 1000 - (Date.now() - refreshStarted)));
       }
     }
 
@@ -103,7 +104,7 @@ function UserDashboard() {
           <article className="card"><div className="card-top"><h2>Last recorded</h2></div><div className="value time">{formatTime(latest?.recorded_at)}</div><p className="card-note">Time of the newest available reading</p></article>
         </section>
         <section className="readings" id="readings"><div className="panel-title"><div><h2>Recent MQ-2 readings</h2><span className="panel-subtitle">Latest records · 5 per page</span></div><Link className="panel-subtitle" to="/user/readings">View all readings</Link></div><div className="table-scroll" role="region" aria-label="Recent sensor readings"><table><thead><tr><th>Reading ID</th><th>Sensor value</th><th>Status</th><th>Recorded</th></tr></thead><tbody>{visibleReadings.map((row) => <tr key={row.reading_id}><td>#{row.reading_id}</td><td>{formatValue(row.sensor_value)}</td><td><span className={`status-badge ${row.status_class}`}>{row.status}</span></td><td>{formatTime(row.recorded_at)}</td></tr>)}{data && !data.readings?.length && <tr><td className="empty-cell" colSpan="4">No readings have been received yet.</td></tr>}</tbody></table></div><nav className="pagination" aria-label="Recent readings pagination"><button className="button secondary" type="button" disabled={currentReadingsPage <= 1} onClick={() => setReadingsPage(currentReadingsPage - 1)}>Previous</button><span>Page {currentReadingsPage} of {readingsPageCount}</span><button className="button secondary" type="button" disabled={currentReadingsPage >= readingsPageCount} onClick={() => setReadingsPage(currentReadingsPage + 1)}>Next</button></nav></section>
-        <p className="footnote">Readings update automatically every 3 seconds. Management actions are reserved for authorized staff.</p>
+        <p className="footnote">Readings refresh automatically every 1 second. Management actions are reserved for authorized staff.</p>
         <ReadingAlert readings={alertReadings} />
       </main>
     </UserLayout>
