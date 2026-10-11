@@ -27,8 +27,11 @@ function StaffDashboard() {
 
   useEffect(() => {
     let active = true;
+    let refreshing = false;
 
     async function refresh() {
+      if (!active || refreshing) return;
+      refreshing = true;
       try {
         const result = await apiRequest("/api/staff/overview", undefined, "GET");
         if (active) {
@@ -37,11 +40,13 @@ function StaffDashboard() {
         }
       } catch (requestError) {
         if (active) setError(requestError.message);
+      } finally {
+        refreshing = false;
       }
     }
 
     refresh();
-    const interval = window.setInterval(refresh, 3000);
+    const interval = window.setInterval(refresh, 1000);
     return () => {
       active = false;
       window.clearInterval(interval);
@@ -57,7 +62,7 @@ function StaffDashboard() {
           <div><span className="eyebrow">System administration</span><h1>Admin Dashboard</h1><p>Monitor the single-zone AirSense setup.</p></div>
         </section>
         {error && <p className="error" role="alert">{error}</p>}
-        <p className="footnote">Live updates every 3 seconds.</p>
+        <p className="footnote">Live updates every 1 second.</p>
         <section className="overview-stats" aria-label="Admin dashboard summary">
           {[
             ["Alerts today", data?.counts?.alerts_today],
