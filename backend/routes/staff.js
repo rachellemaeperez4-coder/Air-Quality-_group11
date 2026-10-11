@@ -168,6 +168,20 @@ router.get("/readings/export.csv", async (req, res) => {
   } catch (error) { fail(res, error); }
 });
 
+router.delete("/readings", async (req, res) => {
+  try {
+    if (req.body?.confirm !== "DELETE ALL READINGS") {
+      return res.status(400).json({ error: "Confirm deletion of all readings." });
+    }
+    const { error, count } = await req.supabase
+      .from("air_quality_readings")
+      .delete({ count: "exact" })
+      .not("reading_id", "is", null);
+    if (error) throw error;
+    res.json({ message: `${count || 0} readings deleted.`, deleted: count || 0 });
+  } catch (error) { fail(res, error); }
+});
+
 router.delete("/readings/:id", async (req, res) => {
   try {
     if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ error: "Select a valid reading ID." });
