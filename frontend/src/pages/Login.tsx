@@ -237,9 +237,7 @@ function Login({ onClose }: LoginProps) {
               ? "Please wait..."
               : signupMode
                 ? "Create User account"
-                : `Sign in as ${
-                    role === "staff" ? "Administrator" : "User"
-                  }`}
+                : "Sign In"}
           </button>
 
           <p className="login-message" role="status" aria-live="polite">
