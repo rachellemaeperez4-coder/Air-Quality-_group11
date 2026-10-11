@@ -7,26 +7,42 @@ import UserLayout from "../../components/UserLayout";
 const formatTime = (value) => value ? formatReadingTime(value) : "—";
 const formatValue = (value) => value === null || value === undefined ? "—" : String(value);
 
-function ReadingAlert({ reading }) {
+function ReadingAlert({ readings }) {
   const dialog = useRef(null);
+  const seen = useRef(new Set());
+  const [queue, setQueue] = useState([]);
+  const reading = queue[0];
 
   useEffect(() => {
-    if (!reading || !["Hazardous", "Very Hazardous"].includes(reading.status)) return;
+    const alerts = [...readings].sort((a, b) => Number(a.reading_id) - Number(b.reading_id)).filter((row) => {
+      const id = String(row.reading_id || "");
+      if (!id || seen.current.has(id)) return false;
+      seen.current.add(id);
+      try {
+        if (sessionStorage.getItem("airsense-last-alert-reading") === id) return false;
+      } catch { /* Session storage is optional. */ }
+      return ["Moderate", "Hazardous", "Very Hazardous"].includes(row.status);
+    });
+    if (alerts.length) setQueue((current) => [...current, ...alerts]);
+  }, [readings]);
+
+  useEffect(() => {
+    if (!reading) return;
     const id = String(reading.reading_id || "");
     if (!id) return;
     try {
-      if (sessionStorage.getItem("airsense-last-alert-reading") === id) return;
       sessionStorage.setItem("airsense-last-alert-reading", id);
     } catch { /* Alert display still works if session storage is unavailable. */ }
     if (dialog.current && !dialog.current.open) dialog.current.showModal();
   }, [reading]);
 
-  return <dialog className="reading-alert-dialog" ref={dialog} data-level={reading?.status.toLowerCase().replaceAll(" ", "-")}><h2>Air quality alert</h2><p>Latest reading is <strong>{reading?.status}</strong>.</p><p>Sensor value: {formatValue(reading?.sensor_value)}</p><p>{reading?.recorded_at ? `Recorded ${formatTime(reading.recorded_at)}` : ""}</p><form method="dialog"><button className="button">Dismiss</button></form></dialog>;
+  return <dialog className="reading-alert-dialog" ref={dialog} onClose={() => setQueue((current) => current.slice(1))} data-level={reading?.status.toLowerCase().replaceAll(" ", "-")}><h2>Air quality alert</h2><p>Recorded reading is <strong>{reading?.status}</strong>.</p><p>Sensor value: {formatValue(reading?.sensor_value)}</p><p>{reading?.recorded_at ? `Recorded ${formatTime(reading.recorded_at)}` : ""}</p><form method="dialog"><button className="button">Dismiss</button></form></dialog>;
 }
 
 function UserDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [alertReadings, setAlertReadings] = useState([]);
   const [readingsPage, setReadingsPage] = useState(1);
   const lastId = useRef("0");
 
@@ -43,6 +59,7 @@ function UserDashboard() {
         if (!active) return;
         loaded = true;
         const incoming = firstLoad ? (result.readings || []) : (result.new_readings || []);
+        setAlertReadings(firstLoad ? (result.latest ? [result.latest] : []) : incoming);
         for (const row of incoming) {
           if (BigInt(row.reading_id) > BigInt(lastId.current)) lastId.current = row.reading_id;
         }
@@ -87,7 +104,7 @@ function UserDashboard() {
         </section>
         <section className="readings" id="readings"><div className="panel-title"><div><h2>Recent MQ-2 readings</h2><span className="panel-subtitle">Latest records · 5 per page</span></div><Link className="panel-subtitle" to="/user/readings">View all readings</Link></div><div className="table-scroll" role="region" aria-label="Recent sensor readings"><table><thead><tr><th>Reading ID</th><th>Sensor value</th><th>Status</th><th>Recorded</th></tr></thead><tbody>{visibleReadings.map((row) => <tr key={row.reading_id}><td>#{row.reading_id}</td><td>{formatValue(row.sensor_value)}</td><td><span className={`status-badge ${row.status_class}`}>{row.status}</span></td><td>{formatTime(row.recorded_at)}</td></tr>)}{data && !data.readings?.length && <tr><td className="empty-cell" colSpan="4">No readings have been received yet.</td></tr>}</tbody></table></div><nav className="pagination" aria-label="Recent readings pagination"><button className="button secondary" type="button" disabled={currentReadingsPage <= 1} onClick={() => setReadingsPage(currentReadingsPage - 1)}>Previous</button><span>Page {currentReadingsPage} of {readingsPageCount}</span><button className="button secondary" type="button" disabled={currentReadingsPage >= readingsPageCount} onClick={() => setReadingsPage(currentReadingsPage + 1)}>Next</button></nav></section>
         <p className="footnote">Readings update automatically every 3 seconds. Management actions are reserved for authorized staff.</p>
-        <ReadingAlert reading={latest} />
+        <ReadingAlert readings={alertReadings} />
       </main>
     </UserLayout>
   );
