@@ -9,6 +9,10 @@
   margin-bottom: 22px;
 }
 
+.app-shell:not(.staff-app) .dashboard-content .alerts-status-cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+
 .app-shell:not(.staff-app) .dashboard-content .reading-status-value {
   display: flex;
   flex-direction: column;
