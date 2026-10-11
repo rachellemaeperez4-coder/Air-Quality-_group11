@@ -78,6 +78,7 @@ function UserDashboard() {
   }, [data, range]);
 
   const latest = data?.latest;
+  const readingQualityClass = latest?.status_class === "status-very-hazardous" ? "status-hazard" : latest?.status_class || "status-neutral";
   const values = chartPoints.map((row) => Number(row.sensor_value)).filter(Number.isFinite);
   const min = values.length ? Math.min(...values) : 0;
   const max = values.length ? Math.max(...values) : 1;
@@ -90,7 +91,7 @@ function UserDashboard() {
         {error && <p className="error" role="alert">{error}</p>}
         <section className="cards" aria-label="Latest reading summary">
           <article className="card"><div className="card-top"><h2>Latest sensor value</h2></div><div className="value">{formatValue(latest?.sensor_value)}</div><p className="card-note">Raw sensor value, not ppm</p></article>
-          <article className="card"><div className="card-top"><h2>Reading status</h2></div><div className="reading-status-value"><strong>{formatValue(latest?.sensor_value)}</strong><span className={`status-badge ${latest?.status_class || "status-neutral"}`}>{latest?.status || "No data"}</span></div><p className="card-note">Latest sensor reading · raw value, not ppm</p></article>
+          <article className={`card user-reading-card ${readingQualityClass}`}><i className={`user-reading-glow ${readingQualityClass}`} aria-hidden="true" /><div className="card-top"><h2>Reading status</h2></div><div className="reading-status-value"><strong>{formatValue(latest?.sensor_value)}</strong><span className={`status-badge ${latest?.status_class || "status-neutral"}`}>{latest?.status || "No data"}</span></div><p className="card-note">Latest sensor reading · raw value, not ppm</p></article>
           <article className="card"><div className="card-top"><h2>Last recorded</h2></div><div className="value time">{formatTime(latest?.recorded_at)}</div><p className="card-note">Time of the newest available reading</p></article>
         </section>
         <section className="trend-panel" aria-labelledby="trend-title">

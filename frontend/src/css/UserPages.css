@@ -22,6 +22,35 @@
   line-height: 1.15;
 }
 
+.app-shell:not(.staff-app) .dashboard-content .user-reading-card {
+  position: relative;
+  padding-right: 90px;
+  transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.user-reading-card.status-good { --reading-color: var(--good); }
+.user-reading-card.status-moderate { --reading-color: var(--warn); }
+.user-reading-card.status-hazard { --reading-color: var(--bad); }
+.app-shell:not(.staff-app) .dashboard-content .user-reading-card:not(.status-neutral) {
+  background: color-mix(in srgb, var(--reading-color) 20%, var(--card));
+  border-color: color-mix(in srgb, var(--reading-color) 65%, var(--line));
+  box-shadow: 0 0 20px color-mix(in srgb, var(--reading-color) 18%, transparent);
+}
+.app-shell:not(.staff-app) .dashboard-content .user-reading-card::after { display: none; }
+.user-reading-card .user-reading-glow {
+  position: absolute;
+  right: 38px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--reading-color, var(--muted));
+  background: currentColor;
+}
+.user-reading-card .user-reading-glow:not(.status-neutral) {
+  box-shadow: 0 0 8px 2px currentColor, 0 0 22px 5px color-mix(in srgb, currentColor 45%, transparent);
+}
+
 .app-shell:not(.staff-app) .dashboard-content .filters {
   display: grid;
   grid-template-columns: minmax(180px, 1.5fr) repeat(3, minmax(125px, 1fr));
