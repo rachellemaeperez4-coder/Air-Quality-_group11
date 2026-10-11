@@ -86,6 +86,10 @@
 :root[data-theme="light"] .staff-app button.button.secondary{border-color:#c9d6df;background:#edf3f6;color:#304a5b}
 :root[data-theme="light"] .staff-app button.button.secondary:hover:not(:disabled){background:#dfeaf0}
 
+.staff-app .overview-stat .current-reading-status{display:inline-flex;margin-top:2px}
+.staff-app .overview-stat .current-reading-status.status-good{color:var(--good);background:var(--good-bg)}
+.staff-app .overview-stat .current-reading-status.status-moderate{color:var(--warn);background:var(--warn-bg)}
+.staff-app .overview-stat .current-reading-status.status-hazard{color:var(--bad);background:var(--bad-bg)}
 .staff-reading-alert-overlay{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgb(2 12 17 / .76);backdrop-filter:blur(5px)}
 .staff-reading-alert{width:min(460px,100%);padding:30px;border:1px solid #365365;border-radius:18px;background:#102435;color:#e8f1f6;box-shadow:0 24px 80px rgb(0 0 0 / .45);animation:staff-alert-enter .2s ease-out}
 .staff-reading-alert-icon{display:grid;width:48px;height:48px;place-items:center;margin-bottom:18px;border-radius:50%;background:#735313;color:#ffe08a;font-size:27px;font-weight:800}

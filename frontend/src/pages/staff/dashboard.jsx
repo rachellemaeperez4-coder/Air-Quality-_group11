@@ -5,6 +5,12 @@ import { apiRequest } from "../../lib/api";
 import { formatReadingTime } from "../../lib/time";
 
 const showTime = formatReadingTime;
+const qualityClasses = {
+  good: "status-good",
+  moderate: "status-moderate",
+  hazardous: "status-hazard",
+  "very hazardous": "status-hazard",
+};
 
 const modules = [
   ["alerts", "Alerts", "Review and update alert states."],
@@ -60,7 +66,11 @@ function StaffDashboard() {
               <span>{label}</span>
               <strong>{value ?? "—"}</strong>
               <small>{label === "Current MQ-2 reading"
-                ? data?.readings?.[0]?.air_quality_status || "No readings received yet"
+                ? data?.readings?.[0]
+                  ? <span className={`status-badge current-reading-status ${qualityClasses[data.readings[0].air_quality_status?.trim().toLowerCase()] || "status-neutral"}`}>
+                      {(data.readings[0].air_quality_status || "Unknown").toUpperCase()}
+                    </span>
+                  : "No readings received yet"
                 : label === "Alerts today"
                   ? `Active today: ${data?.counts?.active_alerts_today ?? "—"}`
                   : "Registered user and staff accounts"}</small>
